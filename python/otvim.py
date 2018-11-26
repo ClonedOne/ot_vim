@@ -1,5 +1,3 @@
-print ("Hello from Python source code!")
-
 class OTVim:
     def __init__(self, vim, autocmds=lambda: None):
         self._vim = vim
@@ -16,4 +14,5 @@ class OTVim:
         pass
 
     def check_buffer(self):
-        pass
+        #  print("Check buffer test")
+        print(list(self._vim.current.buffer))
