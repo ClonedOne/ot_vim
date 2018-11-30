@@ -77,55 +77,46 @@ def find_difs(b1, b2):
 
     cursor_y = cursor[0] - 1
     cursor_x = cursor[1]
-    cur_line_len = len(b2[cursor_y])
-#     old_line_len = len(b1[cursor_y])
-    old_line_len = 0
+
     lines_delta = len(b2) - len(b1)
+    print('lines delta:', lines_delta)
     diff = []
 
-    if lines_delta > 0: # lines were added
+    affected_lines = range(cursor_y, cursor_y + 1 + abs(lines_delta))
+    print('Affected lines:', affected_lines)
 
-#         if cur_line_len == 1 and b2[cursor_y][0] == '':
-#             return [(cursor_y, 0, '\n', OperationType.INSERT)]
+    for line in affected_lines:
+        print('line:', line)
+        s1 = set()
+        s2 = set()
 
-#         elif cursor_x == 0 and cur_line_len > 0:
-#             for i in range(cursor_y, cursor_y + lines_delta):
-#                 for j in b2[i]:
-#                     j = j if j != '' else '\n'
-#                     diff += (cursor_y, 0, j, OperationType.INSERT)
-#             return diff
+        if (line < len(b1)):
+            s1 = set(
+                [
+                    (line, pos, b1[line][pos])
+                    if b1[line][pos] != ''
+                    else (line, pos, '\n')
+                    for pos in range(len(b1[line]))
+                ]
+            )
 
-        for i in range(cursor_y, cursor_y + lines_delta):
-            start = cursor_x if i == cursor_y else 0
-            for j in range(start, len(b2[i])):
-                if b2[i][j] == '': continue
-                diff += [(i, j, b2[i][j], OperationType.INSERT)]
-            diff += [(i, j+1, '\n', OperationType.INSERT)]
-        return diff
-#         else:
-#             print("ERROR: INSERT NOT HANDLED")
+        if (line < len(b2)):
+            s2 = set(
+                [
+                    (line, pos, b2[line][pos])
+                    if b2[line][pos] != ''
+                    else (line, pos, '\n')
+                    for pos in range(len(b2[line]))
+                ]
+            )
 
-
-    elif lines_delta < 0: # lines were removed
-
-        if cursor_x == old_line_len and cur_line_len > old_line_len:
-            return (cursor_y + 1, 0, '\n', OperationType.DELETE)
-
-        elif cursor_x == 0 and cur_line_len == old_line_len:
-        ## TODO: HANDLE MULTIPLE LINES
-            return (cursor_y + 1, 0, b1[cursor_y + 1], OperationType.DELETE)
+        if (s1 == s2):
+           continue
 
         else:
-            print("ERROR: DELETE NOT HANDLED")
+            diff_set = s1 - s2
+            add_set = s2 - s1
 
+        print('diff set:', diff_set)
+        print('add set:', add_set)
 
-    else: # the operation is on the same line
-
-        s1 = set([(cursor_y, pos, b1[cursor_y][pos]) for pos in range(old_line_len)])
-        s2 = set([(cursor_y, pos, b2[cursor_y][pos]) for pos in range(cur_line_len)])
-
-        if len(b1[cursor_y]) <= len(b2[cursor_y]): # insert or change operation
-            diff = [(elem[0], elem[1], elem[2], OperationType.INSERT) for elem in s2 - s1]
-
-        else: # delete operation
-            diff = [(elem[0], elem[1], elem[2], OperationType.DELETE) for elem in s1 - s2]
