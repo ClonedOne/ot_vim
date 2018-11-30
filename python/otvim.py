@@ -59,7 +59,9 @@ def find_difs(b1, b2, cursor):
     print('lines delta:', lines_delta)
     diff = []
 
-    affected_lines = range(cursor_y - 1, cursor_y + 1 + abs(lines_delta))
+    start = cursor_y - 1 if cursor_y - 1 > 0 else 0
+
+    affected_lines = range(start, cursor_y + 1 + abs(lines_delta))
     print('Affected lines:', affected_lines)
 
     for line in affected_lines:
@@ -92,11 +94,12 @@ def find_difs(b1, b2, cursor):
             print('add set:', add_set)
 
         for r in sub_set:
-            pos_1d = sum([len(b1[line]) for line in range(r[0])]) + r[1]
+            pos_1d = sum([(len(b1[line]) + 1) for line in range(r[0])]) + r[1]
+            print(pos_1d)
             diff.append((pos_1d, r[2], OperationType.DELETE))
 
         for i in add_set:
-            pos_1d = sum([len(b2[line]) for line in range(i[0])]) + i[1]
+            pos_1d = sum([(len(b2[line]) + 1) for line in range(i[0])]) + i[1]
             diff.append((pos_1d, i[2], OperationType.INSERT))
 
     return diff
