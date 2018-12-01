@@ -1,5 +1,7 @@
 from enum import Enum
-from pprint import pprint
+import threading
+import sched
+import time
 import vim
 
 class OperationType(Enum):
@@ -11,11 +13,14 @@ class OTVim:
     def __init__(self, vim, autocmds=lambda: None):
         self._vim = vim
         self._autocmds = autocmds
+        self.counter = 0
 
 
     def start(self):
         self._buffer = self._vim.current.buffer[:]
         self._cursor_pos = self._vim.current.window.cursor
+
+        self.listen_server_updates()
 
         #  set up event listeneres
         self._autocmds()
@@ -28,7 +33,7 @@ class OTVim:
     def check_buffer(self):
         #  print("Check buffer test")
         print((self._vim.current.window.cursor))
-        #  pprint([i for i in self._vim.current.buffer])
+        #  print([i for i in self._vim.current.buffer])
 
         new_buffer = self._vim.current.buffer[:]
         new_cursor = self._vim.current.window.cursor
@@ -39,6 +44,25 @@ class OTVim:
         self._cursor_pos = new_cursor
 
         #  print(new_cursor)
+
+
+    def listen_server_updates(self):
+        self.serv_conn = threading.Thread(target=self.server_connection)
+        self.serv_conn.start()
+
+
+
+    def server_connection(self):
+        self.schedule = sched.scheduler(time.time, time.sleep)
+        while(1):
+            self.schedule.enter(10, 1, self.check_for_updates)
+            self.schedule.run()
+
+
+    def check_for_updates(self):
+        print("counter:", self.counter)
+        self.counter += 1
+
 
 
 
@@ -85,7 +109,7 @@ def find_difs(b1, b2, cursor):
         print('s2:', s2)
 
         if (s1 == s2):
-           continue
+            continue
 
         else:
             sub_set = s1 - s2
