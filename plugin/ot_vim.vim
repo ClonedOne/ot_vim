@@ -37,6 +37,7 @@ class OTVimPlugin:
         vim.command(':autocmd!')
         vim.command('autocmd TextChangedI <buffer> python3 otv_plugin.check_buffer_wrap()')
         vim.command('autocmd TextChanged <buffer> python3 otv_plugin.check_buffer_wrap()')
+        vim.command('autocmd VimLeave * python3 otv_plugin.stop()')
 
     def check_buffer_wrap(self):
         print("here")
@@ -53,8 +54,6 @@ class OTVimPlugin:
 otv_plugin = OTVimPlugin()
 
 
-#vim.command('autocmd TextChanged <buffer> py tandem_plugin._check_buffer()')
-#vim.command('autocmd VimLeave * py tandem_plugin.stop()')
 #vim.command("autocmd User TandemApplyText py tandem_plugin._handle_apply_text()")
 
 EOF

@@ -19,6 +19,7 @@ class OTVim:
     def start(self):
         self._buffer = self._vim.current.buffer[:]
         self._cursor_pos = self._vim.current.window.cursor
+        self._still_alive = True
 
         self.listen_server_updates()
 
@@ -27,7 +28,7 @@ class OTVim:
 
 
     def stop(self):
-        pass
+        self._still_alive = False
 
 
     def check_buffer(self):
@@ -51,10 +52,10 @@ class OTVim:
         self.serv_conn.start()
 
 
-
     def server_connection(self):
         self.schedule = sched.scheduler(time.time, time.sleep)
         while(1):
+            if not self._still_alive: exit(0)
             self.schedule.enter(10, 1, self.check_for_updates)
             self.schedule.run()
 
