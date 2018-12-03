@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import argparse
 import json
 import select
@@ -32,16 +34,12 @@ class DocClient:
         self.sk.connect((ip, port))
 
         msg = json.loads(msgr.safe_recv(self.sk))
-        print(msg)
 
         self.pid = msg['pid']
         self.revision = msg['rev']
         self.initial_state = msgr.safe_recv(self.sk)
 
-        #  client_path = "/home/giorgio/projects/ot_proj/ot_vim/python/client"
         client_path = "/Users/gio/projects/ot_vim/python/client"
-
-        #  self.engine = sp.Popen(['./client', str(self.pid), str(self.revision)], stdin=sp.PIPE, stdout=sp.PIPE)
         self.engine = sp.Popen([client_path, str(self.pid), str(self.revision)], stdin=sp.PIPE, stdout=sp.PIPE)
 
         return
@@ -73,9 +71,7 @@ class DocClient:
         return self.initial_state
 
     def send_op(self, op):
-        #  print(op)
         buf = '-1,0,{},{},{}\n'.format(op[0], op[1], op[2]).encode()
-        print(buf)
         self.engine.stdin.write(buf)
         self.engine.stdin.flush()
         return
@@ -104,12 +100,11 @@ class DocClient:
             if 0 == len(rlist):
                 break
             data = self.engine.stdout.readline().decode().split(',')
-            print(data)
             msg = dict()
             msg['pid'] = int(data[0])
             msg['rev'] = int(data[1])
             msg['type'] = int(data[2])
-            msg['c'] = data[3]
+            msg['c'] = int(data[3])
             msg['pos'] = int(data[4])
 
             if -1 == msg['pid']:

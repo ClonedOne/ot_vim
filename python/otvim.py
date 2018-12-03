@@ -84,7 +84,13 @@ class OTVim:
         #  if self.counter % 3 == 0:
         #      self.delete_char('a', len(self._vim.current.buffer[0]) - 1)
         inc_ops = self.dc.recv_ops()
-        #  print(inc_ops)
+        
+        print(inc_ops)
+        for inc_op in inc_ops:
+            if inc_op[0] == OperationType.INSERT:
+                self.insert_char(chr(inc_op[1]), inc_op[2])
+            else:
+                self.delete_char(chr(inc_op[1]), inc_op[2])
 
 
     def insert_char(self, char, pos):
