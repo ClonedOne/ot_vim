@@ -54,8 +54,6 @@ class OTVimPlugin:
 otv_plugin = OTVimPlugin()
 
 
-#vim.command("autocmd User TandemApplyText py tandem_plugin._handle_apply_text()")
-
 EOF
 
 
