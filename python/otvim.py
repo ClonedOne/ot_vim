@@ -30,7 +30,7 @@ class OTVim:
 
         self._still_alive = True
 
-        self.dc = doc_client.DocClient(self._name, self._ip, int(self._port))
+        #  self.dc = doc_client.DocClient(self._name, self._ip, int(self._port))
 
         self.listen_server_updates()
 
@@ -46,7 +46,7 @@ class OTVim:
         #  print("Check buffer test")
         print((self._vim.current.window.cursor))
         #  print([i for i in self._vim.current.buffer]) 
-        irint(test)
+        #  print(test)
         new_buffer = self._vim.current.buffer[:]
         new_cursor = self._vim.current.window.cursor
 
@@ -67,13 +67,30 @@ class OTVim:
         self.schedule = sched.scheduler(time.time, time.sleep)
         while(1):
             if not self._still_alive: exit(0)
-            self.schedule.enter(10, 1, self.check_for_updates)
+            self.schedule.enter(2, 1, self.check_for_updates)
             self.schedule.run()
 
 
     def check_for_updates(self):
-        print("counter:", self.counter)
+        #  print("counter:", self.counter)
         self.counter += 1
+        self.insert_char('a', self.counter)
+
+
+    def insert_char(self, char, pos):
+
+        pos1d = 0
+        for row in range(len(self._vim.current.buffer)):
+            for col in range(len(self._vim.current.buffer[row])):
+                if pos1d == pos:
+                    self._vim.current.buffer[row][col] = char
+                pos1d+=1
+            
+        if pos > pos1d:
+            if char == '\n':
+                self._vim.current.buffer.append('')
+            else:
+                self._vim.current.buffer[row] += char
 
 
 
