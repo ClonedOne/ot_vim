@@ -36,6 +36,7 @@ class OTVimPlugin:
     def autocommands(self):
         vim.command(':autocmd!')
         vim.command('autocmd TextChangedI <buffer> python3 otv_plugin.check_buffer_wrap()')
+        #vim.command('autocmd InsertChange python3 otv_plugin.check_buffer_wrap()')
         # vim.command('autocmd TextChanged <buffer> python3 otv_plugin.check_buffer_wrap()')
         vim.command('autocmd VimLeave * python3 otv_plugin.stop()')
 

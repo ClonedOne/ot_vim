@@ -26,6 +26,8 @@ class OTVim:
         self._ip =  host
         self._port = port
 
+        self.logfile = open('logfile', 'w')
+
 
         print("Opening file: " + name + " on " +  host + ":" + port)
 
@@ -44,8 +46,8 @@ class OTVim:
 
 
     def check_buffer(self):
-        #  print("Check buffer test")
-        print((self._vim.current.window.cursor))
+        print("Check buffer test")
+        #  print((self._vim.current.window.cursor))
         #  print([i for i in self._vim.current.buffer]) 
         #  print(test)
         new_buffer = self._vim.current.buffer[:]
@@ -55,7 +57,8 @@ class OTVim:
 
         for d in diff:
             op = (d[2].value, ord(d[1]), d[0])
-            print(op)
+            self.logfile.write("called send_op: {}, {}, {}\n".format(*op))
+            self.logfile.flush()
             self.dc.send_op(op)
 
         self._buffer = new_buffer
@@ -85,9 +88,10 @@ class OTVim:
         #      self.delete_char('a', len(self._vim.current.buffer[0]) - 1)
         inc_ops = self.dc.recv_ops()
         
-        print(inc_ops)
         for inc_op in inc_ops:
-            if inc_op[0] == OperationType.INSERT:
+            self.logfile.write("received op: {}, {}, {}\n".format(*inc_op))
+            self.logfile.flush()
+            if inc_op[0] == 1:
                 self.insert_char(chr(inc_op[1]), inc_op[2])
             else:
                 self.delete_char(chr(inc_op[1]), inc_op[2])
@@ -98,7 +102,7 @@ class OTVim:
         for row in range(len(self._vim.current.buffer)):
             for col in range(len(self._vim.current.buffer[row])):
                 if pos1d == pos:
-                    #  self._vim.current.buffer[row][col] = char
+                    if self._vim.current.buffer[row][col] == char: return
                     new_str = temp_string[:col] + char + temp_string[col+1:]
                     self._vim.current.buffer[row] = new_str
                     self._vim.command(":redraw")
@@ -108,8 +112,10 @@ class OTVim:
         if pos >=  pos1d:
             if char == '\n':
                 self._vim.current.buffer.append('')
+                self._vim.command(":redraw")
             else:
                 self._vim.current.buffer[row] += char
+                self._vim.command(":redraw")
 
 
     def delete_char(self, char, pos):
@@ -123,9 +129,9 @@ class OTVim:
         for row in range(len(self._vim.current.buffer)):
             for col in range(len(self._vim.current.buffer[row])):
                 if pos1d == pos:
-                    if self._vim.current.buffer[row][pos] != char:
-                        print('ERROR DELETE: Char different from specified')
-                        return
+                    if self._vim.current.buffer[row][pos] == char: return
+                    #  if self._vim.current.buffer[row][pos] != char:
+                        #  self.logfile.write('ERROR DELETE: Char different from specified\n')
                     
                     temp_string = self._vim.current.buffer[row]
                     new_str = temp_string[:col] + temp_string[col+1:]
