@@ -98,15 +98,18 @@ class OTVim:
         for row in range(len(self._vim.current.buffer)):
             for col in range(len(self._vim.current.buffer[row])):
                 if pos1d == pos:
-                    self._vim.current.buffer[row][col] = char
+                    #  self._vim.current.buffer[row][col] = char
+                    new_str = temp_string[:col] + char + temp_string[col+1:]
+                    self._vim.current.buffer[row] = new_str
+                    self._vim.command(":redraw")
+                    return
                 pos1d+=1
             
-        if pos > pos1d:
+        if pos >=  pos1d:
             if char == '\n':
                 self._vim.current.buffer.append('')
             else:
                 self._vim.current.buffer[row] += char
-        self._vim.command(":redraw")
 
 
     def delete_char(self, char, pos):
