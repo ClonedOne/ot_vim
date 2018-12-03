@@ -75,10 +75,11 @@ class OTVim:
         #  print("counter:", self.counter)
         self.counter += 1
         self.insert_char('a', self.counter)
+        if self.counter % 3 == 0:
+            self.delete_char('a', len(self._vim.current.buffer[0]) - 1)
 
 
     def insert_char(self, char, pos):
-
         pos1d = 0
         for row in range(len(self._vim.current.buffer)):
             for col in range(len(self._vim.current.buffer[row])):
@@ -91,6 +92,36 @@ class OTVim:
                 self._vim.current.buffer.append('')
             else:
                 self._vim.current.buffer[row] += char
+        self._vim.command(":redraw")
+
+
+    def delete_char(self, char, pos):
+        #  print(pos)
+        pos1d = 0
+        if pos <= 0:
+            self._vim.current.buffer[0] = ""
+            self._vim.command(":redraw")
+            return
+
+        for row in range(len(self._vim.current.buffer)):
+            for col in range(len(self._vim.current.buffer[row])):
+                if pos1d == pos:
+                    if self._vim.current.buffer[row][pos] != char:
+                        print('ERROR DELETE: Char different from specified')
+                        return
+                    
+                    temp_string = self._vim.current.buffer[row]
+                    new_str = temp_string[:col] + temp_string[col+1:]
+                    
+                    #  print(new_str)
+                    self._vim.current.buffer[row] = new_str
+                    self._vim.command(":redraw")
+
+                pos1d+=1
+            
+        if pos > pos1d:
+            print('Character not in the buffer')
+
 
 
 
