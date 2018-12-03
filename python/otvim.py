@@ -26,11 +26,12 @@ class OTVim:
         self._ip =  host
         self._port = port
 
+
         print("Opening file: " + name + " on " +  host + ":" + port)
 
         self._still_alive = True
 
-        #  self.dc = doc_client.DocClient(self._name, self._ip, int(self._port))
+        self.dc = doc_client.DocClient(self._name, self._ip, int(self._port))
 
         self.listen_server_updates()
 
@@ -52,6 +53,11 @@ class OTVim:
 
         diff = find_difs(self._buffer, new_buffer, new_cursor)
 
+        for d in diff:
+            op = (d[2].value, ord(d[1]), d[0])
+            print(op)
+            self.dc.send_op(op)
+
         self._buffer = new_buffer
         self._cursor_pos = new_cursor
 
@@ -67,16 +73,18 @@ class OTVim:
         self.schedule = sched.scheduler(time.time, time.sleep)
         while(1):
             if not self._still_alive: exit(0)
-            self.schedule.enter(2, 1, self.check_for_updates)
+            self.schedule.enter(0.05, 1, self.check_for_updates)
             self.schedule.run()
 
 
     def check_for_updates(self):
         #  print("counter:", self.counter)
         self.counter += 1
-        self.insert_char('a', self.counter)
-        if self.counter % 3 == 0:
-            self.delete_char('a', len(self._vim.current.buffer[0]) - 1)
+        #  self.insert_char('a', self.counter)
+        #  if self.counter % 3 == 0:
+        #      self.delete_char('a', len(self._vim.current.buffer[0]) - 1)
+        inc_ops = self.dc.recv_ops()
+        #  print(inc_ops)
 
 
     def insert_char(self, char, pos):

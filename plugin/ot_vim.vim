@@ -40,7 +40,6 @@ class OTVimPlugin:
         vim.command('autocmd VimLeave * python3 otv_plugin.stop()')
 
     def check_buffer_wrap(self):
-        print("here")
         self._otv.check_buffer()
 
     def start(self, name, host, port):
