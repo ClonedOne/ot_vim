@@ -103,6 +103,7 @@ class OTVim:
             for col in range(len(self._vim.current.buffer[row])):
                 if pos1d == pos:
                     if self._vim.current.buffer[row][col] == char: return
+                    temp_string = self._vim.current.buffer[row]
                     new_str = temp_string[:col] + char + temp_string[col+1:]
                     self._vim.current.buffer[row] = new_str
                     self._vim.command(":redraw")
