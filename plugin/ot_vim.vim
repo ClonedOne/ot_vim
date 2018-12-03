@@ -10,7 +10,7 @@ endif
 
 let s:otvim_root_dir = fnamemodify(resolve(expand('<sfile>:p')), ':h')
 
-com! OTVim py3 otv_plugin.start()
+com! -nargs=* OTVim py3 otv_plugin.start(<f-args>)
 com! OTVimStop py3 otv_plugin.stop()
 
 python3 << EOF
@@ -43,8 +43,8 @@ class OTVimPlugin:
         print("here")
         self._otv.check_buffer()
 
-    def start(self):
-        self._otv.start()
+    def start(self, name, host, port):
+        self._otv.start(name, host, port)
 
     def stop(self):
         self._otv.stop()
